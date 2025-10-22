@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Resumo do Pedido • TikTok Shop</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="./assets/images/logo.png">
+
+  <style>
+    :root {
+      --brand: #ff0050;
+      --brand-light: #ff4fa4;
+      --border: #e4e7eb;
+      --text: #111827;
+      --green: #10b981;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: Inter, system-ui, Segoe UI, Roboto, Arial;
+      background: #fff;
+      color: var(--text);
+      margin: 0
+    }
+
+    .page {
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fff;
+
+    }
+
+    h1 {
+      font-weight: 800;
+      text-align: center;
+      font-size: 1.25rem;
+      margin: 20px 0 0
+    }
+
+    /* === Seção de Pagamento Estilo TikTok === */
+    .payment-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 14px 18px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .payment-option:hover {
+      border-color: var(--brand);
+      box-shadow: 0 4px 14px rgba(255, 0, 79, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .payment-option.active {
+      border-color: var(--green);
+      background: #f6fffb;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    }
+
+    .payment-option .left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .payment-option .left i {
+      font-size: 20px;
+      color: #00b686;
+    }
+
+    .payment-option .check {
+      color: var(--green);
+      font-size: 18px;
+    }
+
+    .alert {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      font-size: 13px;
+      color: #444;
+      line-height: 1.4;
+      margin: 10px 16px 0
+    }
+
+    .alert i {
+      color: var(--brand)
+    }
+
+    .progress {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 28px 28px 36px;
+      height: 40px;
+    }
+
+    .progress::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #e5e7eb;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .progress::before {
+      top: calc(50% + -8px);
+      /* ou -1px se quiser subir um pouquinho */
+    }
+
+
+    .progress-item {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 33%;
+    }
+
+    .step {
+      background: #fff;
+      border: 2px solid #e5e7eb;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #999;
+      transition: .3s;
+    }
+
+    .step.active {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(255, 0, 80, .1);
+    }
+
+
+    .label {
+      font-size: 11px;
+      text-align: center;
+      color: #666;
+      margin-top: 6px
+    }
+
+    .summary {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 3px 12px rgba(0, 0, 0, .03);
+      padding: 16px;
+
+    }
+
+    .summary h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 12px
+    }
+
+    .summary img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #eee
+    }
+
+    .discount {
+      background: var(--brand);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px
+    }
+
+    .step-section {
+      display: none;
+      padding: 24px 20px 40px;
+      animation: fade .3s ease
+    }
+
+    .step-section.active {
+      display: block
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .step-section h2 {
+      font-weight: 800;
+      font-size: 1rem;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .step-section h2 i {
+      color: var(--brand)
+    }
+
+    .step-section p {
+      color: #666;
+      font-size: 14px;
+      margin: 0 0 20px
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 15px;
+      background: #fff;
+      outline: none
+    }
+
+    input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 2px rgba(255, 0, 80, .15)
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 14px 20px;
+      font-size: 15px;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px
+    }
+
+    .btn-primary {
+      background: linear-gradient(90deg, #ff4fa4, #ff0050);
+      color: #fff;
+      width: 100%;
+      box-shadow: 0 6px 20px rgba(255, 0, 79, .25);
+      margin-top: 22px
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px)
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #555;
+      flex: 1
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+      padding: 24px 20px
+    }
+
+    .safe-icons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 8px;
+      color: #444;
+      font-weight: 600
+    }
+
+    .safe-icons i {
+      color: #222;
+      margin-right: 5px
+    }
+
+    /* === Modal PIX Estilo TikTok === */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .pix-card {
+      background: #121212;
+      color: #fff;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      border: 1px solid #222;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    /* Cabeçalho */
+    .pix-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pix-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pix-header i.fa-pix {
+      color: #00b686;
+      font-size: 20px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #aaa;
+      font-size: 18px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: #fff;
+    }
+
+    /* Badge */
+    .pix-badge {
+      background: rgba(0, 182, 134, 0.1);
+      color: #00b686;
+      border: 1px solid rgba(0, 182, 134, 0.3);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    /* Corpo */
+    .pix-body {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .pix-label {
+      font-size: 14px;
+      color: #b3b3b3;
+      margin-bottom: 8px;
+    }
+
+    .pix-codebox {
+      background: #1c1c1c;
+      border: 1px dashed #2a2a2a;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 12px;
+      color: #e0e0e0;
+      word-break: break-all;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    /* Botão copiar */
+    .copy-btn {
+      margin-top: 14px;
+      background: linear-gradient(90deg, #00b686, #00ffa3);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .copy-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    /* Expiração e status */
+    .pix-expira {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #b3b3b3;
+    }
+
+    #timer {
+      font-weight: 700;
+      color: #00ffa3;
+    }
+
+    .pix-status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    /* Animação */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <h1>Resumo do Pedido</h1>
+
+    <div class="alert">
+      <i class="fa-solid fa-lock"></i>
+      <div>TikTok Shop se responsabiliza por qualquer imprevisto.</div>
+      <strong>Sua compra é segura!</strong>
+    </div>
+
+    <!-- Progresso -->
+    <div class="progress">
+      <div class="progress-item">
+        <div class="step active">1</div>
+        <div class="label">Informações</div>
+      </div>
+      <div class="progress-item">
+        <div class="step">2</div>
+        <div class="label">Entrega</div>
+      </div>
+      <div class="progress-item">
+        <div class="step">3</div>
+        <div class="label">Pagamento</div>
+      </div>
+    </div>
+
+    <!-- Resumo -->
+    <div class="summary">
+      <h3>RESUMO</h3>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="./assets/images/img-1.webp" alt="Produto">
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;">Patinete Elétrico Scooter</div>
+          <div style="font-size:13px;color:#555;margin-top:2px;">Qtd: 1 &nbsp; <b id="order-total">R$ 127,90</b></div>
+        </div>
+        <span class="discount">3% OFF NO PIX</span>
+      </div>
+    </div>
+
+    <!-- Etapa 1 -->
+    <section class="step-section active" id="step-1">
+      <h2><i class="fa-solid fa-user"></i> Identifique-se</h2>
+      <p>Usaremos seus dados para emissão do comprovante e contato.</p>
+      <form id="form-info">
+        <input id="nome" type="text" placeholder="Nome completo" required>
+        <input id="email" type="email" placeholder="E-mail" required>
+        <input id="cpf" type="text" placeholder="CPF (000.000.000-00)" required>
+        <input id="fone" type="tel" placeholder="Celular / Whatsapp" required>
+      </form>
+      <button class="btn btn-primary" id="btn-next-1">
+        Continuar <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </section>
+
+    <!-- Etapa 2 -->
+    <section class="step-section" id="step-2">
+      <h2><i class="fa-solid fa-truck"></i> Endereço de Entrega</h2>
+      <p>Informe seu endereço para envio.</p>
+      <form id="form-address">
+        <input id="cep" type="text" placeholder="CEP" maxlength="9" required>
+        <input id="rua" type="text" placeholder="Rua" readonly required>
+        <input id="numero" type="text" placeholder="Número e complemento" required>
+        <input id="bairro" type="text" placeholder="Bairro" readonly required>
+        <input id="cidade" type="text" placeholder="Cidade" readonly required>
+        <input id="estado" type="text" placeholder="Estado" readonly required>
+      </form>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-prev-2"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+        <button class="btn btn-primary" id="btn-next-2">Continuar <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </section>
+
+    <!-- Etapa 3 -->
+    <section class="step-section" id="step-3">
+      <h2><i class="fa-solid fa-credit-card"></i> Pagamento</h2>
+      <p>Escolha sua forma de pagamento.</p>
+
+      <div class="summary" aria-label="Métodos de pagamento">
+        <div class="payment-option active" id="option-pix">
+          <div class="left">
+            <i class="fa-brands fa-pix"></i> PIX <span style="color:#00b686;">(recomendado)</span>
+          </div>
+          <i class="fa-solid fa-check check"></i>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-prev-3"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+        <button class="btn btn-primary" id="btn-pay">
+          Finalizar Pedido <i class="fa-solid fa-check"></i>
+        </button>
+      </div>
+    </section>
+
+    <footer>
+      <div>Pagamento Seguro</div>
+      <div class="safe-icons">
+        <div><i class="fa-solid fa-lock"></i> Certificado SSL</div>
+        <div><i class="fa-solid fa-shield-halved"></i> Pagamentos Seguros</div>
+      </div>
+      <p style="margin-top:10px;">Termos de uso | Política de Privacidade | Trocas e Devoluções</p>
+    </footer>
+  </div>
+
+  <!-- Modal PIX -->
+  <div class="modal" id="pix-modal" role="dialog" aria-modal="true">
+    <div class="pix-card">
+      <div class="pix-header">
+        <h3><i class="fa-brands fa-pix"></i> Pagamento via PIX</h3>
+        <button class="close-btn" id="btn-close-modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="pix-badge">
+        <i class="fa-solid fa-shield"></i> Transação segura
+      </div>
+
+      <div class="pix-body">
+        <p class="pix-label">Código copia e cola</p>
+        <div class="pix-codebox" id="pix-emv" aria-label="Código copia e cola PIX"></div>
+
+        <button class="copy-btn" id="btn-copy">
+          <i class="fa-regular fa-copy"></i> Copiar código
+        </button>
+
+        <div class="pix-expira">
+          Expira em <span id="timer">15:00</span>
+        </div>
+
+        <div class="pix-status" id="pix-status">Aguardando pagamento...</div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+
+  <script>
+    // --------- Navegação entre etapas ----------
+    let currentStep = 1;
+    const goTo = (n) => {
+      document.getElementById(`step-${currentStep}`).classList.remove('active');
+      currentStep = n;
+      document.getElementById(`step-${currentStep}`).classList.add('active');
+      document.querySelectorAll('.progress .step').forEach((el, i) => el.classList.toggle('active', i < currentStep));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    document.getElementById('btn-next-1').onclick = () => {
+      const f = document.getElementById('form-info');
+      if (!f.checkValidity()) return f.reportValidity();
+      goTo(2);
+    };
+    document.getElementById('btn-prev-2').onclick = () => goTo(1);
+    document.getElementById('btn-next-2').onclick = () => {
+      const f = document.getElementById('form-address');
+      if (!f.checkValidity()) return f.reportValidity();
+      goTo(3);
+    };
+    document.getElementById('btn-prev-3').onclick = () => goTo(2);
+
+    // --------- CEP auto fill ----------
+    document.getElementById('cep').addEventListener('blur', async function () {
+      const cep = this.value.replace(/\D/g, '');
+      if (cep.length !== 8) return;
+      try {
+        const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+        const d = await r.json();
+        if (d.erro) return alert('CEP não encontrado.');
+        document.getElementById('rua').value = d.logradouro || '';
+        document.getElementById('bairro').value = d.bairro || '';
+        document.getElementById('cidade').value = d.localidade || '';
+        document.getElementById('estado').value = d.uf || '';
+      } catch {
+        alert('Erro ao buscar CEP.');
+      }
+    });
+
+    // --------- PIX flow ----------
+    const modal = document.getElementById('pix-modal');
+    const emvBox = document.getElementById('pix-emv');
+    const statusEl = document.getElementById('pix-status');
+    const timerEl = document.getElementById('timer');
+    const closeBtn = document.getElementById('btn-close-modal');
+    const copyBtn = document.getElementById('btn-copy');
+    const payBtn = document.getElementById('btn-pay');
+    let pollInterval = null, countdown = null;
+
+    closeBtn.onclick = () => { modal.classList.remove('open'); stopPolling(); };
+    copyBtn.onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(emvBox.textContent.trim());
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copiado!';
+        setTimeout(() => copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copiar código', 1500);
+      } catch { }
+    };
+
+    function startTimer(seconds = 900) { // 15min
+      let t = seconds;
+      countdown = setInterval(() => {
+        const m = String(Math.floor(t / 60)).padStart(2, '0');
+        const s = String(t % 60).padStart(2, '0');
+        timerEl.textContent = `${m}:${s}`;
+        if (--t < 0) {
+          clearInterval(countdown);
+          statusEl.textContent = 'Código expirado. Gere novamente.';
+          stopPolling();
+        }
+      }, 1000);
+    }
+    function stopPolling() {
+      if (pollInterval) clearInterval(pollInterval);
+      if (countdown) clearInterval(countdown);
+    }
+
+    // --------- Função pra desenhar QR no canvas ----------
+    function drawQr(emv) {
+      const canvas = document.getElementById("qr-canvas");
+      if (!canvas) return console.warn("Canvas não encontrado!");
+
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      try {
+        // Cria um elemento temporário pra renderizar o QR
+        const tempDiv = document.createElement("div");
+        new QRCode(tempDiv, {
+          text: emv,
+          width: 220,
+          height: 220,
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Pega o QR gerado e desenha no canvas
+        const img = tempDiv.querySelector("img");
+        if (img) {
+          img.onload = () => ctx.drawImage(img, 0, 0, 220, 220);
+          img.crossOrigin = "anonymous";
+          if (img.complete) ctx.drawImage(img, 0, 0, 220, 220);
+        }
+        console.log("✅ QR Code gerado com sucesso!");
+      } catch (err) {
+        console.error("❌ Erro ao gerar QR:", err);
+      }
+    }
+
+
+
+    // --------- Clique em pagar → cria PIX via backend ----------
+    payBtn.onclick = async () => {
+      try {
+        payBtn.disabled = true;
+        payBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PIX...';
+
+        // 💰 Valor em reais
+        const amountBRL = 10; // preço fixo
+
+        // 🧠 Formata CPF, telefone e valor corretamente
+        const cpf = document.getElementById('cpf').value.replace(/\D/g, '');      // remove pontos e traços
+        const phone = document.getElementById('fone').value.replace(/\D/g, '');   // remove tudo que não for número
+        const amount = Math.round(amountBRL * 10); // transforma em centavos (10 → 1000)
+
+        // 📦 Payload no formato aceito pela SyncPay
+        const payload = {
+          amount: amount, // ✅ agora em centavos
+          description: 'Patinete Elétrico Scooter',
+          customer: { // ✅ nome do campo aceito pela API
+            name: document.getElementById('nome').value.trim(),
+            document: cpf, // ✅ CPF só números
+            email: document.getElementById('email').value.trim(),
+            phone: phone   // ✅ telefone só números
+          },
+          address: {
+            cep: document.getElementById('cep').value.replace(/\D/g, ''),
+            street: document.getElementById('rua').value.trim(),
+            number: document.getElementById('numero').value.trim(),
+            district: document.getElementById('bairro').value.trim(),
+            city: document.getElementById('cidade').value.trim(),
+            state: document.getElementById('estado').value.trim()
+          }
+        };
+
+
+
+        console.log("📤 Enviando ao backend SyncPay:", payload);
+
+        const res = await fetch('/api/syncpay/pix', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Falha ao criar PIX");
+
+        // 🔹 Captura campos reais retornados pela SyncPayments
+        const emv = data.pix_code || data.data?.pix_code;
+        const identifier = data.identifier || data.data?.identifier;
+
+        if (!emv) throw new Error("PIX não retornou código válido.");
+
+        // Exibe modal e QR
+        emvBox.textContent = emv;
+        drawQr(emv);
+        statusEl.textContent = 'Aguardando pagamento...';
+        modal.classList.add('open');
+        startTimer(15 * 60);
+
+        // --------- Polling de status ----------
+        pollInterval = setInterval(async () => {
+          try {
+            const sres = await fetch('/api/syncpay/status?identifier=' + encodeURIComponent(identifier));
+            if (!sres.ok) return;
+            const sdata = await sres.json();
+
+            // 🔹 Agora o status real vem dentro de sdata.data.status
+            const status = (sdata.data?.status || sdata.status || '').toLowerCase();
+
+            if (['paid', 'approved', 'confirmed', 'completed'].includes(status)) {
+              statusEl.textContent = '✅ Pagamento aprovado! Obrigado.';
+              stopPolling();
+            } else if (['expired', 'canceled', 'failed'].includes(status)) {
+              statusEl.textContent = '⚠️ Pagamento não concluído. Tente novamente.';
+              stopPolling();
+            }
+          } catch (err) {
+            console.warn("Erro ao checar status:", err);
+          }
+        }, 4000);
+
+      } catch (err) {
+        alert('Erro ao gerar PIX: ' + (err?.message || 'tente novamente'));
+      } finally {
+        payBtn.disabled = false;
+        payBtn.innerHTML = 'Finalizar Pedido <i class="fa-solid fa-check"></i>';
+      }
+    };
+
+
+  </script>
+
+</body>
+
+</html>
