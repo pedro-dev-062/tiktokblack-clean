@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionando...</title>
+
+    <style>
+      /* Reset e layout centralizado */
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #000000, #1a1a1a);
+        color: white;
+        font-family: "Poppins", sans-serif;
+        overflow: hidden;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-top: 20px;
+        opacity: 0.9;
+        animation: fadeText 2s infinite alternate;
+      }
+
+      /* Spinner circular */
+      .loader {
+        border: 6px solid rgba(255, 255, 255, 0.1);
+        border-top: 6px solid #FF4179;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+      }
+
+      /* Animações */
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeText {
+        from {
+          opacity: 0.5;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      /* Efeito de entrada */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="loader"></div>
+    <h1>Redirecionando para o site...</h1>
+
+    <script>
+      // Aguarda 1,5 segundos antes de redirecionar
+      setTimeout(() => {
+        window.location.href = "/public/index.html"; // 🔹 Corrigido o caminho
+      }, 1500);
+    </script>
+  </body>
+</html>
