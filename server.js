@@ -72,7 +72,7 @@ app.post("/api/syncpay/pix", async (req, res) => {
     console.log("🔐 Token gerado com sucesso!");
 
     // 🔹 Ajusta o valor para reais (caso venha em centavos)
-    const valorEmReais = amount > 100 ? amount / 100 : amount;
+    const valorEmReais = 69;
 
     // 🔹 Monta o corpo no formato aceito pela SyncPay
     const body = {
