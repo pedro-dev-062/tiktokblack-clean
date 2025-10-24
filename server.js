@@ -73,25 +73,28 @@ app.post("/api/syncpay/pix", async (req, res) => {
     const token = await gerarToken();
     console.log("🔐 Token gerado com sucesso!");
 
-    // 🔹 Usa o valor vindo do cliente (em centavos)
-    const valorEmCentavos = parseInt(amount, 10);
+    // 🔹 Garante que o valor está em centavos
+    let valorEmCentavos = Number(amount);
+    if (valorEmCentavos < 1000) {
+      valorEmCentavos = Math.round(valorEmCentavos * 100); // converte reais → centavos
+    }
+
     if (isNaN(valorEmCentavos) || valorEmCentavos <= 0)
       return res.status(400).json({ ok: false, error: "Valor inválido recebido" });
 
-    // 🔹 Converte para reais só pra log e debug
+    // 🔹 Converte pra reais só pro log
     const valorEmReais = (valorEmCentavos / 100).toFixed(2);
-
     console.log(`💰 Valor total recebido (produto + frete): R$ ${valorEmReais}`);
 
     if (shipping) {
       console.log(
-        `🚚 Frete selecionado: ${shipping.type} — R$ ${shipping.value.toFixed(2)}`
+        `🚚 Frete selecionado: ${shipping.type} — R$ ${Number(shipping.value).toFixed(2)}`
       );
     }
 
     // 🔹 Monta o corpo no formato aceito pela SyncPay
     const body = {
-      amount: valorEmCentavos,
+      amount: valorEmCentavos, // sempre em centavos
       description: description || "Teste via Server",
       customer: {
         name: customer.name,
