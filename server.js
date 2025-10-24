@@ -21,9 +21,12 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, "public")));
 
 // 🔹 Páginas principais
-app.get("./index.html", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
-app.get("/public/checkout.html", (_, res) => res.sendFile(path.join(__dirname, "public", "checkout.html")));
-
+app.get("./index.html", (_, res) =>
+  res.sendFile(path.join(__dirname, "public", "index.html"))
+);
+app.get("/public/checkout.html", (_, res) =>
+  res.sendFile(path.join(__dirname, "public", "checkout.html"))
+);
 
 // -------------------- 🧠 Utilidades -------------------- //
 async function gerarToken() {
@@ -32,8 +35,8 @@ async function gerarToken() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       client_id: process.env.SYNCPAY_CLIENT_ID,
-      client_secret: process.env.SYNCPAY_CLIENT_SECRET
-    })
+      client_secret: process.env.SYNCPAY_CLIENT_SECRET,
+    }),
   });
 
   const data = await resp.json();
@@ -52,15 +55,14 @@ async function buscarCEP(cep) {
     street: d.logradouro || "",
     district: d.bairro || "",
     city: d.localidade || "",
-    state: d.uf || ""
+    state: d.uf || "",
   };
 }
 
 // -------------------- 💳 API PIX -------------------- //
-// -------------------- 💳 API PIX -------------------- //
 app.post("/api/syncpay/pix", async (req, res) => {
   try {
-    const { amount, description, customer } = req.body;
+    const { amount, description, customer, shipping } = req.body;
 
     if (!customer?.document)
       return res.status(400).json({ ok: false, error: "CPF é obrigatório" });
@@ -71,19 +73,32 @@ app.post("/api/syncpay/pix", async (req, res) => {
     const token = await gerarToken();
     console.log("🔐 Token gerado com sucesso!");
 
-    // 🔹 Ajusta o valor para reais (caso venha em centavos)
-    const valorEmReais = 69;
+    // 🔹 Usa o valor vindo do cliente (em centavos)
+    const valorEmCentavos = parseInt(amount, 10);
+    if (isNaN(valorEmCentavos) || valorEmCentavos <= 0)
+      return res.status(400).json({ ok: false, error: "Valor inválido recebido" });
+
+    // 🔹 Converte para reais só pra log e debug
+    const valorEmReais = (valorEmCentavos / 100).toFixed(2);
+
+    console.log(`💰 Valor total recebido (produto + frete): R$ ${valorEmReais}`);
+
+    if (shipping) {
+      console.log(
+        `🚚 Frete selecionado: ${shipping.type} — R$ ${shipping.value.toFixed(2)}`
+      );
+    }
 
     // 🔹 Monta o corpo no formato aceito pela SyncPay
     const body = {
-      amount: valorEmReais,
+      amount: valorEmCentavos,
       description: description || "Teste via Server",
       customer: {
         name: customer.name,
         document: customer.document.replace(/\D/g, ""),
         email: customer.email,
-        phone: customer.phone.replace(/\D/g, "")
-      }
+        phone: customer.phone.replace(/\D/g, ""),
+      },
     };
 
     console.log("📦 Enviando para SyncPay:", body);
@@ -93,9 +108,9 @@ app.post("/api/syncpay/pix", async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
 
     const data = await r.json();
@@ -112,18 +127,14 @@ app.post("/api/syncpay/pix", async (req, res) => {
     res.json({
       ok: true,
       pix_code: data.pix_code,
-      identifier: data.identifier
+      identifier: data.identifier,
     });
-
   } catch (err) {
     console.error("💥 Erro PIX:", err);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
 
-
-// -------------------- 📡 API STATUS -------------------- //
-// -------------------- 📡 API STATUS -------------------- //
 // -------------------- 📡 API STATUS -------------------- //
 app.get("/api/syncpay/status", async (req, res) => {
   try {
@@ -135,16 +146,18 @@ app.get("/api/syncpay/status", async (req, res) => {
 
     const token = await gerarToken();
 
-    // 🔹 Rota correta segundo a documentação oficial
-    const resp = await fetch(`${process.env.BASE_URL}/api/partner/v1/transaction/${identifier}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
+    const resp = await fetch(
+      `${process.env.BASE_URL}/api/partner/v1/transaction/${identifier}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
+    );
 
-    const text = await resp.text(); // ← lê primeiro como texto pra debugar
+    const text = await resp.text();
     console.log("📦 Resposta bruta SyncPay:", text);
 
     let data;
@@ -158,7 +171,7 @@ app.get("/api/syncpay/status", async (req, res) => {
       return res.status(resp.status).json({
         ok: false,
         error: data.message || `Erro HTTP ${resp.status}`,
-        data
+        data,
       });
 
     res.json({ ok: true, data });
@@ -167,7 +180,6 @@ app.get("/api/syncpay/status", async (req, res) => {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
-
 
 // -------------------- 🏠 API CEP -------------------- //
 app.get("/api/cep/:cep", async (req, res) => {
@@ -180,6 +192,6 @@ app.get("/api/cep/:cep", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Servidor rodando em http://0.0.0.0:${PORT}`);
 });

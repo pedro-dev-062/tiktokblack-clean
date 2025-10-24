@@ -310,6 +310,32 @@
       padding: 24px 20px
     }
 
+
+    .shipping-section {
+  margin-top: 28px;
+  margin-bottom: 24px;
+}
+
+.shipping-section h3 {
+  margin: 0 0 14px 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+}
+
+.shipping-section .payment-option {
+  margin-bottom: 10px;
+}
+
+.shipping-total {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #333;
+  border-top: 1px dashed #ddd;
+  padding-top: 10px;
+  line-height: 1.6;
+}
+
     .safe-icons {
       display: flex;
       justify-content: center;
@@ -450,6 +476,26 @@
       color: #b3b3b3;
     }
 
+    .shipping-section {
+      margin-top: 28px;
+      /* dá respiro acima */
+      margin-bottom: 24px;
+      /* espaço antes dos botões */
+    }
+
+    .shipping-section h3 {
+      margin: 0 0 14px 4px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #111;
+    }
+
+    .shipping-section .payment-option {
+      margin-bottom: 10px;
+      /* separa as opções entre si */
+    }
+
+
     #timer {
       font-weight: 700;
       color: #00ffa3;
@@ -559,6 +605,38 @@
             <i class="fa-brands fa-pix"></i> PIX <span style="color:#00b686;">(recomendado)</span>
           </div>
           <i class="fa-solid fa-check check"></i>
+        </div>
+      </div>
+
+      <!-- Seção de Frete -->
+      <div class="summary shipping-section" aria-label="Opções de Frete">
+        <h3>Escolha o frete</h3>
+
+        <div class="payment-option active" id="frete-gratis" data-price="0">
+          <div class="left">
+            <i class="fa-solid fa-truck"></i>
+            Frete Grátis <span style="color:#10b981;">(5 a 7 dias úteis)</span>
+          </div>
+          <i class="fa-solid fa-check check"></i>
+        </div>
+
+        <div class="payment-option" id="frete-rapido" data-price="9.90">
+          <div class="left">
+            <i class="fa-solid fa-bolt"></i>
+            Entrega Rápida <span style="color:#ff0050;">(2 a 3 dias úteis)</span>
+          </div>
+        </div>
+
+        <div class="payment-option" id="frete-prioritario" data-price="19.90">
+          <div class="left">
+            <i class="fa-solid fa-plane-up"></i>
+            Entrega Prioritária <span style="color:#ff4fa4;">(1 dia útil)</span>
+          </div>
+        </div>
+
+        <div class="shipping-total">
+          <strong>Frete:</strong> <span id="frete-valor">R$ 0,00</span><br>
+          <strong>Total:</strong> <span id="pedido-total">R$ 69,00</span>
         </div>
       </div>
 
@@ -814,7 +892,41 @@
       }
     };
 
+    // --------- Seleção de Frete ----------
+   // --------- Seleção de Frete + Atualização de Total ----------
+const freteOptions = document.querySelectorAll('[id^="frete-"]');
+const freteValorEl = document.getElementById('frete-valor');
+const pedidoTotalEl = document.getElementById('pedido-total');
+const orderTotalEl = document.getElementById('order-total'); // valor no resumo inicial
+const baseTotal = 69.00; // preço base do produto
 
+let selectedFrete = 'frete-gratis';
+let freteValor = 0;
+
+freteOptions.forEach(opt => {
+  opt.addEventListener('click', () => {
+    // Alterna o visual ativo
+    freteOptions.forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+
+    // Atualiza seleção e valores
+    selectedFrete = opt.id;
+    freteValor = parseFloat(opt.dataset.price);
+
+    // Atualiza texto de valores
+    freteValorEl.textContent = `R$ ${freteValor.toFixed(2).replace('.', ',')}`;
+    const totalFinal = baseTotal + freteValor;
+    pedidoTotalEl.textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+    orderTotalEl.textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+
+    console.log(`🚚 Frete selecionado: ${selectedFrete} (R$ ${freteValor.toFixed(2)})`);
+  });
+});
+
+
+
+
+    
   </script>
 
 </body>
